@@ -14,7 +14,18 @@ public class HealthController {
         response.put("status", "UP");
         response.put("message", "Styler Backend is running successfully");
         response.put("timestamp", System.currentTimeMillis());
-        response.put("database", "MySQL Connected");
+        response.put("database", "Connected");
+        return response;
+    }
+
+    @GetMapping("/api/health")
+    public Map<String, Object> apiHealth() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "UP");
+        response.put("message", "Styler Backend API is healthy");
+        response.put("timestamp", System.currentTimeMillis());
+        response.put("service", "styler-backend");
+        response.put("version", "1.0.0");
         return response;
     }
 
@@ -37,7 +48,7 @@ public class HealthController {
         Map<String, Object> response = new HashMap<>();
         response.put("message", "API is working!");
         response.put("cors", "CORS is configured");
-        response.put("database", "MySQL connection active");
+        response.put("database", "Database connection active");
         return response;
     }
 }
