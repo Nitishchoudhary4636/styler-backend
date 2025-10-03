@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-@Profile("!health-only")
+@Profile({"prod", "dev", "default"})
 public class UserService {
     
     @Autowired

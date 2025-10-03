@@ -8,7 +8,7 @@ import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "*")
-@Profile("!health-only")
+@Profile({"prod", "dev", "default"})
 public class HealthController {
 
     @GetMapping("/health")

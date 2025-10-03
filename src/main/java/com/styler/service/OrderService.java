@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@Profile("!health-only")
+@Profile({"prod", "dev", "default"})
 public class OrderService {
     
     @Autowired

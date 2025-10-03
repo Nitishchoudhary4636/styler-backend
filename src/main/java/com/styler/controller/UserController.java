@@ -14,7 +14,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/users")
 @CrossOrigin(origins = "*")
-@Profile("!health-only")
+@Profile({"prod", "dev", "default"})
 public class UserController {
     
     @Autowired
