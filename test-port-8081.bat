@@ -1,0 +1,3 @@
+@echo off
+echo Starting health-only mode on port 8081...
+java -Dspring.profiles.active=health-only -Dserver.port=8081 -jar target\styler-backend-1.0.0.jar

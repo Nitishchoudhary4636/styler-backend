@@ -3,6 +3,7 @@ package com.styler.service;
 import com.styler.model.*;
 import com.styler.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Profile("!health-only")
 public class OrderService {
     
     @Autowired

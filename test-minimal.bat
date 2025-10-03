@@ -1,0 +1,3 @@
+@echo off
+echo Testing Styler Backend with minimal profile...
+java -Dspring.profiles.active=minimal -Dserver.port=8080 -jar target\styler-backend-1.0.0.jar

@@ -1,0 +1,3 @@
+@echo off
+echo Testing Styler Backend with health-only profile...
+java -Dspring.profiles.active=health-only -Dserver.port=8080 -jar target\styler-backend-1.0.0.jar

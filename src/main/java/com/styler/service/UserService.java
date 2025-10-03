@@ -3,6 +3,7 @@ package com.styler.service;
 import com.styler.model.User;
 import com.styler.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
+@Profile("!health-only")
 public class UserService {
     
     @Autowired

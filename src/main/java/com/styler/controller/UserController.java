@@ -3,6 +3,7 @@ package com.styler.controller;
 import com.styler.model.User;
 import com.styler.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/users")
 @CrossOrigin(origins = "*")
+@Profile("!health-only")
 public class UserController {
     
     @Autowired
