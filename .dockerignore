@@ -1,0 +1,39 @@
+# Maven wrapper files
+.mvn/
+mvnw
+mvnw.cmd
+
+# Target directory (built files)
+target/
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+logs/
+
+# Environment files
+.env
+.env.local
+
+# Temporary files
+*.tmp
+*.temp
+
+# Git files
+.git/
+.gitignore
+README.md
+*.md
+
+# Test files
+src/test/

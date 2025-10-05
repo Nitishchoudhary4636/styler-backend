@@ -1,12 +1,11 @@
-# Render Deployment Configuration
+# Render Deployment Configuration for Docker
 version: 1
 
 services:
   - type: web
     name: styler-backend
-    env: java
-    buildCommand: mvn clean package -DskipTests
-    startCommand: java -Dserver.port=$PORT -Dspring.profiles.active=render-prod -Djava.awt.headless=true -Xmx512m -jar target/styler-backend-1.0.0.jar
+    env: docker
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: DATABASE_URL
         fromDatabase:
