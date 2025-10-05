@@ -12,14 +12,16 @@ import java.util.Map;
 public class HealthController {
 
     @GetMapping("/health")
-    public Map<String, Object> health() {
+    public ResponseEntity<Map<String, Object>> health() {
         Map<String, Object> response = new HashMap<>();
         response.put("status", "UP");
-        response.put("message", "Styler Backend is running successfully - Basic health check");
-        response.put("timestamp", System.currentTimeMillis());
+        response.put("message", "Railway health check passed");
         response.put("service", "styler-backend");
-        response.put("check_type", "basic");
-        return response;
+        response.put("timestamp", System.currentTimeMillis());
+        
+        return ResponseEntity.ok()
+            .header("Content-Type", "application/json")
+            .body(response);
     }
 
     @GetMapping("/api/health")

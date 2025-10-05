@@ -5,9 +5,9 @@
     "buildCommand": "mvn clean package -DskipTests"
   },
   "deploy": {
-    "startCommand": "java -Dserver.port=$PORT -Dspring.profiles.active=prod -Djava.awt.headless=true -Xmx512m -Dspring.main.lazy-initialization=false -Dlogging.level.root=INFO -jar target/styler-backend-1.0.0.jar",
+    "startCommand": "java -Dserver.port=$PORT -Dspring.profiles.active=prod -Djava.awt.headless=true -Xmx512m -Dspring.main.lazy-initialization=true -Dspring.jpa.defer-datasource-initialization=true -Dlogging.level.root=WARN -jar target/styler-backend-1.0.0.jar",
     "healthcheckPath": "/health",
-    "healthcheckTimeout": 300,
+    "healthcheckTimeout": 120,
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 3
   }
