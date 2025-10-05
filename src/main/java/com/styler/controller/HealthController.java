@@ -1,6 +1,5 @@
 package com.styler.controller;
 
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
@@ -8,7 +7,6 @@ import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "*")
-@Profile({"prod", "dev", "default", "render-prod"})
 public class HealthController {
 
     @GetMapping("/health")
