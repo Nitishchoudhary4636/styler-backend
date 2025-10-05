@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import javax.sql.DataSource;
 import java.net.URI;
-import java.net.URISyntaxException;
+
 
 @Configuration
 @Profile("render-prod")
@@ -20,9 +20,20 @@ public class RenderDataSourceConfig {
             try {
                 URI uri = new URI(databaseUrl);
                 
-                String jdbcUrl = "jdbc:postgresql://" + uri.getHost() + ":" + uri.getPort() + uri.getPath();
-                String username = uri.getUserInfo().split(":")[0];
-                String password = uri.getUserInfo().split(":")[1];
+                // Handle port - use 5432 as default if not specified
+                int port = uri.getPort();
+                if (port == -1) {
+                    port = 5432; // Default PostgreSQL port
+                }
+                
+                String jdbcUrl = "jdbc:postgresql://" + uri.getHost() + ":" + port + uri.getPath();
+                String[] userInfo = uri.getUserInfo().split(":");
+                String username = userInfo[0];
+                String password = userInfo.length > 1 ? userInfo[1] : "";
+                
+                System.out.println("DEBUG: Original URL: " + databaseUrl);
+                System.out.println("DEBUG: JDBC URL: " + jdbcUrl);
+                System.out.println("DEBUG: Username: " + username);
                 
                 return DataSourceBuilder
                     .create()
@@ -32,8 +43,9 @@ public class RenderDataSourceConfig {
                     .driverClassName("org.postgresql.Driver")
                     .build();
                     
-            } catch (URISyntaxException e) {
-                throw new RuntimeException("Invalid DATABASE_URL format", e);
+            } catch (Exception e) {
+                System.err.println("Error parsing DATABASE_URL: " + e.getMessage());
+                throw new RuntimeException("Invalid DATABASE_URL format: " + databaseUrl, e);
             }
         }
         
