@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -268,5 +271,102 @@ public class FastRailwayController {
         response.put("mode", "railway-fast");
         
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/admin/init-database")
+    public ResponseEntity<Map<String, Object>> initializeDatabase() {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            // Get Railway database URL from environment
+            String databaseUrl = System.getenv("DATABASE_URL");
+            if (databaseUrl == null) {
+                response.put("success", false);
+                response.put("error", "DATABASE_URL environment variable not set");
+                return ResponseEntity.status(400).body(response);
+            }
+
+            System.out.println("Initializing database tables...");
+
+            try (Connection conn = DriverManager.getConnection(databaseUrl);
+                 Statement stmt = conn.createStatement()) {
+
+                // Create users table
+                String createUsersTable = """
+                    CREATE TABLE IF NOT EXISTS users (
+                        id BIGSERIAL PRIMARY KEY,
+                        username VARCHAR(50) UNIQUE NOT NULL,
+                        email VARCHAR(100) UNIQUE NOT NULL,
+                        password VARCHAR(255) NOT NULL,
+                        full_name VARCHAR(100),
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                """;
+                stmt.executeUpdate(createUsersTable);
+                System.out.println("✓ Created users table");
+
+                // Create orders table
+                String createOrdersTable = """
+                    CREATE TABLE IF NOT EXISTS orders (
+                        id BIGSERIAL PRIMARY KEY,
+                        user_id BIGINT NOT NULL,
+                        order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        status VARCHAR(20) DEFAULT 'PENDING',
+                        total_amount DECIMAL(10,2) NOT NULL,
+                        FOREIGN KEY (user_id) REFERENCES users(id)
+                    )
+                """;
+                stmt.executeUpdate(createOrdersTable);
+                System.out.println("✓ Created orders table");
+
+                // Create order_items table
+                String createOrderItemsTable = """
+                    CREATE TABLE IF NOT EXISTS order_items (
+                        id BIGSERIAL PRIMARY KEY,
+                        order_id BIGINT NOT NULL,
+                        product_id BIGINT NOT NULL,
+                        product_name VARCHAR(100) NOT NULL,
+                        quantity INTEGER NOT NULL,
+                        price DECIMAL(10,2) NOT NULL,
+                        FOREIGN KEY (order_id) REFERENCES orders(id)
+                    )
+                """;
+                stmt.executeUpdate(createOrderItemsTable);
+                System.out.println("✓ Created order_items table");
+
+                // Create shipping_addresses table
+                String createShippingAddressesTable = """
+                    CREATE TABLE IF NOT EXISTS shipping_addresses (
+                        id BIGSERIAL PRIMARY KEY,
+                        order_id BIGINT NOT NULL,
+                        street VARCHAR(200) NOT NULL,
+                        city VARCHAR(100) NOT NULL,
+                        state VARCHAR(100) NOT NULL,
+                        zip_code VARCHAR(20) NOT NULL,
+                        country VARCHAR(100) NOT NULL,
+                        FOREIGN KEY (order_id) REFERENCES orders(id)
+                    )
+                """;
+                stmt.executeUpdate(createShippingAddressesTable);
+                System.out.println("✓ Created shipping_addresses table");
+
+                response.put("success", true);
+                response.put("message", "Database tables initialized successfully");
+                response.put("tables", List.of("users", "orders", "order_items", "shipping_addresses"));
+                response.put("mode", "railway-fast");
+
+                return ResponseEntity.ok(response);
+
+            }
+        } catch (Exception e) {
+            System.err.println("Error initializing database: " + e.getMessage());
+            e.printStackTrace();
+            
+            response.put("success", false);
+            response.put("error", "Failed to initialize database: " + e.getMessage());
+            response.put("mode", "railway-fast");
+            
+            return ResponseEntity.status(500).body(response);
+        }
     }
 }
