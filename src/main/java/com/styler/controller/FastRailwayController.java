@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -15,7 +16,9 @@ public class FastRailwayController {
 
     // In-memory storage for demonstration
     private static final Map<String, Map<String, Object>> users = new ConcurrentHashMap<>();
+    private static final Map<String, Map<String, Object>> orders = new ConcurrentHashMap<>();
     private static final AtomicLong userIdGenerator = new AtomicLong(1);
+    private static final AtomicLong orderIdGenerator = new AtomicLong(1);
 
     @GetMapping("/health")
     public ResponseEntity<Map<String, Object>> health() {
@@ -152,10 +155,117 @@ public class FastRailwayController {
             "/health - Railway Health Check",
             "/api/health - API Health Check",
             "/api/users/register - User Registration (In-Memory)",
-            "/api/users/login - User Login (In-Memory)"
+            "/api/users/login - User Login (In-Memory)",
+            "/api/orders - Order Creation (In-Memory)",
+            "/api/orders/{orderId} - Order Details (In-Memory)"
         });
         response.put("note", "Ultra-fast startup for Railway health checks. Data stored in memory.");
         response.put("timestamp", System.currentTimeMillis());
+        
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/api/orders")
+    public ResponseEntity<Map<String, Object>> createOrder(@RequestBody Map<String, Object> request) {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            // Validate required fields
+            if (!request.containsKey("items") || !request.containsKey("totalAmount")) {
+                response.put("success", false);
+                response.put("message", "Items and totalAmount are required");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            // Get or create user
+            String userEmail = (String) request.get("userEmail");
+            String userId = (String) request.get("userId");
+            
+            Map<String, Object> user = null;
+            if (userEmail != null) {
+                user = users.get(userEmail);
+            } else if (userId != null) {
+                user = users.values().stream()
+                    .filter(u -> userId.equals(u.get("id").toString()))
+                    .findFirst()
+                    .orElse(null);
+            }
+            
+            if (user == null) {
+                response.put("success", false);
+                response.put("message", "User not found. Please register first.");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            // Generate order
+            Long orderId = orderIdGenerator.getAndIncrement();
+            String orderIdString = "ORD-" + String.format("%06d", orderId);
+            
+            Map<String, Object> order = new HashMap<>();
+            order.put("id", orderId);
+            order.put("orderId", orderIdString);
+            order.put("userId", user.get("id"));
+            order.put("userEmail", user.get("email"));
+            order.put("items", request.get("items"));
+            order.put("totalAmount", request.get("totalAmount"));
+            order.put("shippingAddress", request.get("shippingAddress"));
+            order.put("paymentMethod", request.getOrDefault("paymentMethod", "COD"));
+            order.put("status", "CONFIRMED");
+            order.put("createdAt", System.currentTimeMillis());
+            order.put("mode", "railway-fast");
+            
+            // Store order
+            orders.put(orderIdString, order);
+            
+            // Success response
+            response.put("success", true);
+            response.put("message", "Order created successfully");
+            response.put("id", orderId);
+            response.put("orderId", orderIdString);
+            response.put("status", "CONFIRMED");
+            response.put("totalAmount", request.get("totalAmount"));
+            response.put("items", request.get("items"));
+            response.put("shippingAddress", request.get("shippingAddress"));
+            response.put("createdAt", order.get("createdAt"));
+            response.put("mode", "railway-fast");
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Order creation failed: " + e.getMessage());
+            response.put("mode", "railway-fast");
+            
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
+    @GetMapping("/api/orders/{orderId}")
+    public ResponseEntity<Map<String, Object>> getOrder(@PathVariable String orderId) {
+        Map<String, Object> response = new HashMap<>();
+        
+        Map<String, Object> order = orders.get(orderId);
+        if (order == null) {
+            response.put("success", false);
+            response.put("message", "Order not found");
+            return ResponseEntity.notFound().build();
+        }
+        
+        return ResponseEntity.ok(order);
+    }
+
+    @GetMapping("/api/orders/user/{userId}")
+    public ResponseEntity<Map<String, Object>> getUserOrders(@PathVariable String userId) {
+        Map<String, Object> response = new HashMap<>();
+        
+        List<Map<String, Object>> userOrders = orders.values().stream()
+            .filter(order -> userId.equals(order.get("userId").toString()))
+            .collect(java.util.stream.Collectors.toList());
+        
+        response.put("success", true);
+        response.put("orders", userOrders);
+        response.put("count", userOrders.size());
+        response.put("mode", "railway-fast");
         
         return ResponseEntity.ok(response);
     }
