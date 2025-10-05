@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/orders")
 @CrossOrigin(origins = "*")
-@Profile({"prod", "dev", "default", "railway-prod"})
+@Profile({"prod", "dev", "default", "render-prod"})
 public class OrderController {
     
     @Autowired

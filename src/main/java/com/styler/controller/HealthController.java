@@ -8,14 +8,14 @@ import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "*")
-@Profile({"prod", "dev", "default", "railway-prod"})
+@Profile({"prod", "dev", "default", "render-prod"})
 public class HealthController {
 
     @GetMapping("/health")
     public ResponseEntity<Map<String, Object>> health() {
         Map<String, Object> response = new HashMap<>();
         response.put("status", "UP");
-        response.put("message", "Railway health check passed");
+        response.put("message", "Render health check passed");
         response.put("service", "styler-backend");
         response.put("timestamp", System.currentTimeMillis());
         

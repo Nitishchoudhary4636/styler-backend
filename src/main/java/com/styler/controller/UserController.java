@@ -14,7 +14,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/users")
 @CrossOrigin(origins = "*")
-@Profile({"prod", "dev", "default", "railway-prod"})
+@Profile({"prod", "dev", "default", "render-prod"})
 public class UserController {
     
     @Autowired
