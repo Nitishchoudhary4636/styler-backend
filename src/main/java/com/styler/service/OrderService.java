@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@Profile({"prod", "dev", "default"})
+@Profile({"prod", "dev", "default", "railway-prod"})
 public class OrderService {
     
     @Autowired
