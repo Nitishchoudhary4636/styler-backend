@@ -46,20 +46,60 @@ public class RailwayController {
         response.put("message", "Switch to production mode with database for full functionality");
         response.put("endpoints", new String[]{
             "/health - Railway Health Check",
-            "/api/health - API Health Check"
+            "/api/health - API Health Check",
+            "/api/users/register - User Registration (Minimal Mode)",
+            "/api/users/login - User Login (Minimal Mode)"
         });
         response.put("timestamp", System.currentTimeMillis());
         
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/api/users/register")
-    public ResponseEntity<Map<String, Object>> registerNotAvailable() {
+    @PostMapping("/api/users/register")
+    public ResponseEntity<Map<String, Object>> register(@RequestBody Map<String, String> request) {
         Map<String, Object> response = new HashMap<>();
-        response.put("success", false);
-        response.put("message", "User registration not available in railway-minimal mode");
+        
+        try {
+            String email = request.get("email");
+            String name = request.get("name");
+            String phone = request.get("phone");
+            String password = request.get("password");
+            
+            if (email == null || name == null || phone == null || password == null) {
+                response.put("success", false);
+                response.put("message", "All fields are required");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            // Simple success response for Railway minimal mode
+            response.put("success", true);
+            response.put("message", "User registered successfully in Railway minimal mode");
+            response.put("mode", "railway-minimal");
+            response.put("id", Math.abs(email.hashCode()) % 10000); // Simple ID generation
+            response.put("email", email);
+            response.put("name", name);
+            response.put("phone", phone);
+            response.put("note", "Data not persisted - upgrade to production mode for database storage");
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Registration failed: " + e.getMessage());
+            response.put("mode", "railway-minimal");
+            
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+    
+    @PostMapping("/api/users/login")
+    public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> request) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("message", "Login simulation - Railway minimal mode");
         response.put("mode", "railway-minimal");
-        response.put("action", "Add PostgreSQL database and switch to production profile");
+        response.put("email", request.get("email"));
+        response.put("note", "Upgrade to production mode for real authentication");
         
         return ResponseEntity.ok(response);
     }
