@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-@Profile({"prod", "dev", "default", "railway-prod", "railway-db"})
+@Profile({"prod", "dev", "default", "railway-prod", "railway-db", "render-prod"})
 public class UserService {
     
     @Autowired
