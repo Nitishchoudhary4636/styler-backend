@@ -15,9 +15,10 @@ public class HealthController {
     public Map<String, Object> health() {
         Map<String, Object> response = new HashMap<>();
         response.put("status", "UP");
-        response.put("message", "Styler Backend is running successfully");
+        response.put("message", "Styler Backend is running successfully - Basic health check");
         response.put("timestamp", System.currentTimeMillis());
-        response.put("database", "Connected");
+        response.put("service", "styler-backend");
+        response.put("check_type", "basic");
         return response;
     }
 

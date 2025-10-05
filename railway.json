@@ -6,8 +6,8 @@
   },
   "deploy": {
     "startCommand": "java -Dserver.port=$PORT -Dspring.profiles.active=prod -Djava.awt.headless=true -Xmx512m -Dspring.main.lazy-initialization=false -Dlogging.level.root=INFO -jar target/styler-backend-1.0.0.jar",
-    "healthcheckPath": "/api/health",
-    "healthcheckTimeout": 600,
+    "healthcheckPath": "/health",
+    "healthcheckTimeout": 300,
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 3
   }
