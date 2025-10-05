@@ -28,6 +28,8 @@ public class UserController {
             String name = request.get("name");
             String phone = request.get("phone");
             
+            System.out.println("Registration request received: email=" + email + ", name=" + name + ", phone=" + phone);
+            
             if (email == null || password == null || name == null || phone == null) {
                 Map<String, Object> errorResponse = new HashMap<>();
                 errorResponse.put("success", false);
@@ -39,6 +41,7 @@ public class UserController {
             String firstName = nameParts[0];
             String lastName = nameParts.length > 1 ? nameParts[1] : "";
             
+            System.out.println("Creating user: firstName=" + firstName + ", lastName=" + lastName);
             User user = userService.createUser(email, password, firstName, lastName, phone);
             
             Map<String, Object> response = new HashMap<>();
@@ -52,10 +55,18 @@ public class UserController {
             return ResponseEntity.ok(response);
             
         } catch (IllegalArgumentException e) {
+            System.err.println("IllegalArgumentException in registration: " + e.getMessage());
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);
             response.put("message", e.getMessage());
             return ResponseEntity.badRequest().body(response);
+        } catch (Exception e) {
+            System.err.println("Unexpected error in registration: " + e.getClass().getName() + " - " + e.getMessage());
+            e.printStackTrace();
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "An error occurred during registration: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
         }
     }
     
