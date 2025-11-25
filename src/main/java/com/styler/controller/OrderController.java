@@ -96,7 +96,8 @@ public class OrderController {
             shippingAddress.setCity(addressData.getOrDefault("city", ""));
             shippingAddress.setState(addressData.getOrDefault("state", ""));
             shippingAddress.setPostalCode(addressData.getOrDefault("pincode", addressData.getOrDefault("postalCode", "")));
-            shippingAddress.setLandmark(addressData.getOrDefault("phone", "")); // Store phone in landmark field temporarily
+            shippingAddress.setPhone(addressData.getOrDefault("phone", ""));
+            shippingAddress.setLandmark(addressData.getOrDefault("landmark", ""));
             
             // Parse total amount (use totalAmount if available, otherwise calculate)
             BigDecimal totalAmount;
