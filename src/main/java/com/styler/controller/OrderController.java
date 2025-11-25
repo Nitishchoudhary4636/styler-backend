@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/orders")
-@Profile({"prod", "render-prod"})
+@Profile("prod")
 public class OrderController {
     
     @Autowired

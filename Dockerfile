@@ -29,7 +29,7 @@ COPY --from=build /app/target/styler-backend-1.0.0.jar ./app.jar
 EXPOSE $PORT
 
 # Set environment variables
-ENV SPRING_PROFILES_ACTIVE=render-prod
+ENV SPRING_PROFILES_ACTIVE=prod
 
 # Run the application
-CMD java -Dserver.port=$PORT -Dspring.profiles.active=render-prod -Djava.awt.headless=true -Xmx512m -jar app.jar
+CMD java -Dserver.port=$PORT -Dspring.profiles.active=prod -Djava.awt.headless=true -Xmx512m -jar app.jar

@@ -16,7 +16,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
-@Profile({"prod", "render-prod"})
+@Profile("prod")
 public class UserController {
     
     @Autowired
