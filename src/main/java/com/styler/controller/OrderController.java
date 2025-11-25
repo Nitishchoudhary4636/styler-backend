@@ -4,6 +4,7 @@ import com.styler.model.*;
 import com.styler.service.OrderService;
 import com.styler.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/orders")
-@CrossOrigin(origins = "*")
+@Profile({"prod", "render-prod"})
 public class OrderController {
     
     @Autowired

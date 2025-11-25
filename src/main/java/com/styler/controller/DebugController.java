@@ -3,6 +3,7 @@ package com.styler.controller;
 import com.styler.model.*;
 import com.styler.service.OrderService;
 import com.styler.service.UserService;
+import org.springframework.context.annotation.Profile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +13,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/debug")
-@CrossOrigin(origins = "*")
+@Profile("dev")
 public class DebugController {
 
     @Autowired
