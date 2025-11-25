@@ -2,17 +2,14 @@ package com.styler.controller;
 
 import com.styler.model.User;
 import com.styler.service.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
@@ -44,12 +41,9 @@ public class UserController {
             User user = userService.createUser(email, password, firstName, lastName, phone);
             
             Map<String, Object> response = new HashMap<>();
-            response.put("id", user.getId());
-            response.put("name", user.getFirstName() + " " + user.getLastName());
-            response.put("email", user.getEmail());
-            response.put("phone", user.getPhone());
             response.put("success", true);
             response.put("message", "User registered successfully");
+            response.put("user", buildUserResponse(user));
             
             return ResponseEntity.ok(response);
             
@@ -80,13 +74,9 @@ public class UserController {
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             Map<String, Object> response = new HashMap<>();
-            response.put("id", user.getId());
-            response.put("name", (user.getFirstName() != null ? user.getFirstName() : "") + 
-                               (user.getLastName() != null ? " " + user.getLastName() : "").trim());
-            response.put("email", user.getEmail());
-            response.put("phone", user.getPhone() != null ? user.getPhone() : "");
             response.put("success", true);
             response.put("message", "Login successful");
+            response.put("user", buildUserResponse(user));
             
             return ResponseEntity.ok(response);
         } else {
@@ -104,14 +94,8 @@ public class UserController {
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             Map<String, Object> response = new HashMap<>();
-            response.put("id", user.getId());
-            response.put("email", user.getEmail());
-            response.put("firstName", user.getFirstName());
-            response.put("lastName", user.getLastName());
-            response.put("phone", user.getPhone());
-            response.put("joinDate", user.getJoinDate());
-            response.put("lastLogin", user.getLastLogin());
-            
+            response.put("success", true);
+            response.put("user", buildUserResponse(user));
             return ResponseEntity.ok(response);
         } else {
             return ResponseEntity.notFound().build();
@@ -205,16 +189,30 @@ public class UserController {
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "User updated successfully");
-            response.put("user", Map.of(
-                "id", updatedUser.getId(),
-                "email", updatedUser.getEmail(),
-                "firstName", updatedUser.getFirstName() != null ? updatedUser.getFirstName() : "",
-                "lastName", updatedUser.getLastName() != null ? updatedUser.getLastName() : ""
-            ));
+            response.put("user", buildUserResponse(updatedUser));
             
             return ResponseEntity.ok(response);
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    /**
+     * Private helper method to build a consistent user response map.
+     * This ensures all endpoints return the same user object structure.
+     * @param user The User entity to build the response from.
+     * @return A map representing the user object for the API response.
+     */
+    private Map<String, Object> buildUserResponse(User user) {
+        String fullName = Arrays.stream(new String[]{user.getFirstName(), user.getLastName()})
+                .filter(s -> s != null && !s.isEmpty())
+                .collect(Collectors.joining(" "));
+
+        return Map.of(
+            "id", user.getId(),
+            "name", fullName,
+            "email", user.getEmail(),
+            "phone", user.getPhone() != null ? user.getPhone() : ""
+        );
     }
 }
