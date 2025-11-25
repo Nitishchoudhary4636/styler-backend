@@ -41,6 +41,9 @@ public class ShippingAddress {
     @Column(name = "landmark")
     private String landmark;
     
+    @Column(name = "phone")
+    private String phone;
+    
    
     public ShippingAddress() {}
     
@@ -80,6 +83,14 @@ public class ShippingAddress {
     
     public String getLandmark() { return landmark; }
     public void setLandmark(String landmark) { this.landmark = landmark; }
+    
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
     
   
     public String getFullAddress() {
