@@ -190,6 +190,38 @@ public class OrderController {
         }
         return total;
     }
+
+    private User resolveUser(Long userId, String email, Map<String, Object> payload) {
+        if (userId != null) {
+            Optional<User> userOpt = userService.findById(userId);
+            if (userOpt.isPresent()) {
+                return userOpt.get();
+            }
+        }
+        if (email != null) {
+            Optional<User> userOpt = userService.findByEmail(email);
+            if (userOpt.isPresent()) {
+                return userOpt.get();
+            }
+            return createGuestUser(email, payload);
+        }
+        return null;
+    }
+
+    private User createGuestUser(String email, Map<String, Object> payload) {
+        Map<String, String> shippingAddress = getMap(payload, "shippingAddress");
+        String fullName = (String) payload.getOrDefault("fullName", shippingAddress.getOrDefault("fullName", ""));
+        String firstName = "";
+        String lastName = "";
+        if (!fullName.isBlank()) {
+            String[] parts = fullName.split("\\s+", 2);
+            firstName = parts[0];
+            lastName = parts.length > 1 ? parts[1] : "";
+        }
+        String phone = shippingAddress.getOrDefault("phone", "");
+        String password = UUID.randomUUID().toString();
+        return userService.createUser(email, password, firstName, lastName, phone);
+    }
     
     @GetMapping("/user/{userId}")
     public ResponseEntity<?> getUserOrders(@PathVariable Long userId) {
