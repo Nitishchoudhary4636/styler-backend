@@ -56,8 +56,10 @@ public class OrderController {
             }
             
             // Parse order items
-            @SuppressWarnings("unchecked")
-            List<Map<String, Object>> itemsData = (List<Map<String, Object>>) request.get("items");
+            List<Map<String, Object>> itemsData = getList(request, "items");
+            if (itemsData.isEmpty()) {
+                return badRequest("items array is required and cannot be empty");
+            }
             List<OrderItem> items = new ArrayList<>();
             
             for (Map<String, Object> itemData : itemsData) {
@@ -77,11 +79,9 @@ public class OrderController {
             }
             
             // Parse shipping address
-            @SuppressWarnings("unchecked")
-            Map<String, String> addressData = (Map<String, String>) request.get("shippingAddress");
-            
-            if (addressData == null) {
-                throw new IllegalArgumentException("shippingAddress object is required.");
+            Map<String, String> addressData = getMap(request, "shippingAddress");
+            if (addressData.isEmpty()) {
+                return badRequest("shippingAddress object is required");
             }
 
             ShippingAddress shippingAddress = new ShippingAddress();
@@ -105,15 +105,7 @@ public class OrderController {
             shippingAddress.setLandmark(addressData.getOrDefault("landmark", ""));
             
             // Parse total amount (use totalAmount if available, otherwise calculate)
-            BigDecimal totalAmount;
-            if (request.containsKey("totalAmount")) {
-                totalAmount = new BigDecimal(request.get("totalAmount").toString());
-            } else {
-                totalAmount = new BigDecimal("0.00");
-                for (OrderItem item : items) {
-                    totalAmount = totalAmount.add(item.getPrice().multiply(new BigDecimal(item.getQuantity())));
-                }
-            }
+            BigDecimal totalAmount = calculateTotalAmount(request, items);
             
             // Create order with simplified approach
             Order order = orderService.createSimpleOrder(user, items, shippingAddress, totalAmount, 
@@ -187,6 +179,36 @@ public class OrderController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    private List<Map<String, Object>> getList(Map<String, Object> payload, String key) {
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> value = (List<Map<String, Object>>) payload.get(key);
+        return value == null ? Collections.emptyList() : value;
+    }
+
+    private Map<String, String> getMap(Map<String, Object> payload, String key) {
+        @SuppressWarnings("unchecked")
+        Map<String, String> value = (Map<String, String>) payload.get(key);
+        return value == null ? Collections.emptyMap() : value;
+    }
+
+    private ResponseEntity<Map<String, Object>> badRequest(String message) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", false);
+        response.put("message", message);
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    private BigDecimal calculateTotalAmount(Map<String, Object> request, List<OrderItem> items) {
+        if (request.containsKey("totalAmount")) {
+            return new BigDecimal(request.get("totalAmount").toString());
+        }
+        BigDecimal total = BigDecimal.ZERO;
+        for (OrderItem item : items) {
+            total = total.add(item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
+        }
+        return total;
     }
     
     @GetMapping("/user/{userId}")
