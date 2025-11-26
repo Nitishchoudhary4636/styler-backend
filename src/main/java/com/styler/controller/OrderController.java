@@ -60,33 +60,19 @@ public class OrderController {
             List<Map<String, Object>> itemsData = (List<Map<String, Object>>) request.get("items");
             List<OrderItem> items = new ArrayList<>();
             
-            if (itemsData == null || itemsData.isEmpty()) {
-                throw new IllegalArgumentException("Order must contain at least one item.");
-            }
-
             for (Map<String, Object> itemData : itemsData) {
                 OrderItem item = new OrderItem();
+                item.setProductId(Long.valueOf(itemData.get("productId").toString()));
+                item.setProductName((String) itemData.get("productName"));
+                item.setPrice(new BigDecimal(itemData.get("price").toString()));
+                item.setQuantity(Integer.valueOf(itemData.get("quantity").toString()));
                 
-                // Safely parse required fields
-                item.setProductId(safeGetLong(itemData, "productId"));
-                item.setProductName(safeGetString(itemData, "productName"));
-                item.setPrice(safeGetBigDecimal(itemData, "price"));
-                item.setQuantity(safeGetInteger(itemData, "quantity"));
-
                 // Optional fields with defaults
                 item.setColor(itemData.containsKey("color") ? (String) itemData.get("color") : "");
                 item.setSize(itemData.containsKey("size") ? (String) itemData.get("size") : "");
                 item.setProductCategory(itemData.containsKey("category") ? (String) itemData.get("category") : "");
                 item.setImageUrl(itemData.containsKey("imageUrl") ? (String) itemData.get("imageUrl") : "");
                 
-                // Basic validation
-                if (item.getQuantity() < 1) {
-                    throw new IllegalArgumentException("Item quantity must be at least 1 for product: " + item.getProductName());
-                }
-                if (item.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
-                    throw new IllegalArgumentException("Item price must be greater than 0 for product: " + item.getProductName());
-                }
-
                 items.add(item);
             }
             
@@ -265,41 +251,6 @@ public class OrderController {
             response.put("success", false);
             response.put("message", e.getMessage());
             return ResponseEntity.badRequest().body(response);
-        }
-    }
-
-    // Helper methods for safe parsing from a Map
-    private String safeGetString(Map<String, Object> map, String key) {
-        if (!map.containsKey(key) || map.get(key) == null) {
-            throw new IllegalArgumentException("Missing required field: " + key);
-        }
-        return map.get(key).toString();
-    }
-
-    private Long safeGetLong(Map<String, Object> map, String key) {
-        String value = safeGetString(map, key);
-        try {
-            return Long.valueOf(value);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid number format for field '" + key + "': " + value);
-        }
-    }
-
-    private Integer safeGetInteger(Map<String, Object> map, String key) {
-        String value = safeGetString(map, key);
-        try {
-            return Integer.valueOf(value);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid integer format for field '" + key + "': " + value);
-        }
-    }
-
-    private BigDecimal safeGetBigDecimal(Map<String, Object> map, String key) {
-        String value = safeGetString(map, key);
-        try {
-            return new BigDecimal(value);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid decimal format for field '" + key + "': " + value);
         }
     }
 }
