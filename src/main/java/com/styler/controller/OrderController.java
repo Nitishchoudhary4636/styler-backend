@@ -28,31 +28,11 @@ public class OrderController {
            
             User user = null;
             
-            if (request.containsKey("userId")) {
-                Long userId = Long.valueOf(request.get("userId").toString());
-                Optional<User> userOpt = userService.findById(userId);
-                if (!userOpt.isPresent()) {
-                    Map<String, Object> errorResponse = new HashMap<>();
-                    errorResponse.put("success", false);
-                    errorResponse.put("message", "User not found with ID: " + userId);
-                    return ResponseEntity.badRequest().body(errorResponse);
-                }
-                user = userOpt.get();
-            } else if (request.containsKey("userEmail")) {
-                String userEmail = (String) request.get("userEmail");
-                Optional<User> userOpt = userService.findByEmail(userEmail);
-                if (!userOpt.isPresent()) {
-                    Map<String, Object> errorResponse = new HashMap<>();
-                    errorResponse.put("success", false);
-                    errorResponse.put("message", "User not found with email: " + userEmail);
-                    return ResponseEntity.badRequest().body(errorResponse);
-                }
-                user = userOpt.get();
-            } else {
-                Map<String, Object> errorResponse = new HashMap<>();
-                errorResponse.put("success", false);
-                errorResponse.put("message", "Either userId or userEmail is required");
-                return ResponseEntity.badRequest().body(errorResponse);
+            String requestEmail = request.containsKey("userEmail") ? (String) request.get("userEmail") : null;
+            Long requestUserId = request.containsKey("userId") ? Long.valueOf(request.get("userId").toString()) : null;
+            user = resolveUser(requestUserId, requestEmail, request);
+            if (user == null) {
+                return badRequest("User not found. Please log in or register before placing an order.");
             }
             
             // Parse order items
