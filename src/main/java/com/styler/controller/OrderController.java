@@ -215,12 +215,25 @@ public class OrderController {
         List<Map<String, Object>> ordersResponse = orders.stream()
             .map(order -> {
                 Map<String, Object> orderMap = new HashMap<>();
+                orderMap.put("id", order.getId());
                 orderMap.put("orderId", order.getOrderId());
                 orderMap.put("status", order.getStatus().toString());
                 orderMap.put("totalAmount", order.getTotalAmount());
-                orderMap.put("orderDate", order.getOrderDate());
+                orderMap.put("createdAt", order.getOrderDate()); // Use 'createdAt' for consistency
                 orderMap.put("estimatedDelivery", order.getEstimatedDelivery());
-                orderMap.put("itemCount", order.getItems().size());
+                orderMap.put("shippingAddress", order.getShippingAddress());
+                
+                // Include item details, as the frontend likely needs them
+                orderMap.put("items", order.getItems().stream().map(item -> {
+                    Map<String, Object> itemMap = new HashMap<>();
+                    itemMap.put("productId", item.getProductId());
+                    itemMap.put("productName", item.getProductName());
+                    itemMap.put("quantity", item.getQuantity());
+                    itemMap.put("price", item.getPrice());
+                    itemMap.put("imageUrl", item.getImageUrl());
+                    return itemMap;
+                }).collect(Collectors.toList()));
+
                 return orderMap;
             })
             .collect(Collectors.toList());
