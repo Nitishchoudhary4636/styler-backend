@@ -93,6 +93,11 @@ public class OrderController {
             // Parse shipping address
             @SuppressWarnings("unchecked")
             Map<String, String> addressData = (Map<String, String>) request.get("shippingAddress");
+            
+            if (addressData == null) {
+                throw new IllegalArgumentException("shippingAddress object is required.");
+            }
+
             ShippingAddress shippingAddress = new ShippingAddress();
             
             // Handle both fullName and firstName/lastName
