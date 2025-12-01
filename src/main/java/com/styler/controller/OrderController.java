@@ -203,9 +203,8 @@ public class OrderController {
             if (userOpt.isPresent()) {
                 return userOpt.get();
             }
-            return createGuestUser(email, payload);
         }
-        return null;
+        return createGuestUser(email, payload);
     }
 
     private User createGuestUser(String email, Map<String, Object> payload) {
@@ -219,8 +218,15 @@ public class OrderController {
             lastName = parts.length > 1 ? parts[1] : "";
         }
         String phone = shippingAddress.getOrDefault("phone", "");
+        String resolvedEmail = email;
+        if (resolvedEmail == null || resolvedEmail.isBlank()) {
+            resolvedEmail = "guest+" + UUID.randomUUID() + "@styler.local";
+        }
+        while (userService.findByEmail(resolvedEmail).isPresent()) {
+            resolvedEmail = "guest+" + UUID.randomUUID() + "@styler.local";
+        }
         String password = UUID.randomUUID().toString();
-        return userService.createUser(email, password, firstName, lastName, phone);
+        return userService.createUser(resolvedEmail, password, firstName, lastName, phone);
     }
     
     @GetMapping("/user/{userId}")
